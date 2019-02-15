@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.authors       = ["shaker"]
   spec.email         = ["shakerislam@gmail.com"]
 
-  spec.summary       = %q{Write a short summary, because RubyGems requires one.}
-  spec.description   = %q{Write a longer description or delete this line.}
-  spec.homepage      = "http://www.example.com"
-  spec.license       = "MIT"
+  spec.summary       = %q{Update ENV vars at runtime through k8s mounted secrets}
+  spec.description   = %q{Update ENV vars at runtime through k8s mounted secrets}
+  spec.homepage      = "https://github.com/shaqq/puma-runtime_env-k8s"
+  spec.license       = "Apache-2.0"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
