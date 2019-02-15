@@ -1,8 +1,12 @@
 # Puma::RuntimeEnv::K8s
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/puma/runtime_env/k8s`. To experiment with that code, run `bin/console` for an interactive prompt.
+Update ENV vars at runtime through k8s mounted secrets for your Puma app.
 
-TODO: Delete this and the text above, and describe your gem
+Kubernetes mounted secrets update automatically as you edit them, so with this plugin, your app will pickup any changes to your mounted secrets without a restart.
+
+However! K8s mounted secrets currently update in long, unpredictable intervals if you don't tune the refresh cycles yourself. We've seen it take up to 60 seconds for a mounted secret to update. For more info: https://github.com/kubernetes/kubernetes/issues/30189
+
+Learn more about Kubernetes Secrets here: https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets
 
 ## Installation
 
@@ -22,17 +26,41 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Have the following ENV vars defined at bootup:
 
-## Development
+```ruby
+ENV["PUMA_RUNTIME_ENV_ADAPTER"] = "k8s"
+ENV["SECRETS_MOUNT_PATH"] = "/path/to/your/secrets/here"
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# some other configs to know about:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+ENV["PUMA_RUNTIME_ENV_INTERVAL"]    # how often to check for new ENV (in seconds), defaults to 10
+
+ENV["PUMA_RUNTIME_ENV_RESTRICTED"]  # anything you don't want to be updated at runtime,
+                                    # automatically restricts required ENV's like PUMA_RUNTIME_ENV_ADAPTER
+```
+
+In your `puma.rb` or similary puma config file, register your plugin:
+
+```ruby
+# other puma configs
+
+plugin :runtime_env
+```
+
+And then you're off to the races:
+
+```sh
+$ bundle exec puma -C config/puma.rb
+
+$ kubectl edit secrets k8sSecretName
+
+```
+
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/puma-runtime_env-k8s. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/shaqq/puma-runtime_env-k8s. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
